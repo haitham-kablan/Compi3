@@ -18,7 +18,7 @@
 	Enum_class* curEnumClass;
 	stack<vector<Node*>> ParamListStack = stack<vector<Node*>>();
 	
-	void end_f_scope();
+	
 	
 
 %}
@@ -614,7 +614,7 @@ int main()
 	yyparse();
 	
 	
-	symbolTable.p_sys_stack(symbolTable.scopes_table);
+	//symbolTable.p_sys_stack(symbolTable.scopes_table);
 	
 	/*checking if main exsists*/
 	Function* main_func = (Function*)symbolTable.getVar("main");
@@ -632,39 +632,6 @@ void yyerror(char const* error){
 	exit(0);
 }
 
-void end_f_scope(stack<Variable*> st){
-	
-	end_scope();
-	
-	stack<Variable*> cpy = stack<Variable*>();
-    Variable* tmp;
-    while(!st.empty()){
-        tmp = st.top();
-        st.pop();
-        cpy.push(tmp);
-    }
-
-	/*now we have the reversed stack*/
-	
-    while(!cpy.empty()){
-	
-		Variable* var = cpy.top()->type;
-		switch (var->type){
-			case INT_t : printID(var->name, var->offset, "INT"); break;
-            case BOOL_t : printID(var->name, var->offset, "BOOL")); break;
-            case BYTE_t : printID(var->name, var->offset, "BYTE"); break;
-			case ENUM_t :printID(var->name, var->offset,(Enum_var*)var->enum_type ); break;
-//todo u salih lzb , brb 5 min
-			break;
-          
-           
-        }
-    }
-	
-	
-
-
-}
 
 
 
