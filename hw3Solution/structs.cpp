@@ -22,6 +22,29 @@ vector<string> TokensToString(vector<TokenType>& vec){
     return ret;
 }
 
+vector<string> modifiedTokensToString(vector<TokenType>& vec){
+    vector<string> ret = vector<string>();
+    for ( int i = 0; i < vec.size() ; i++)
+    {
+        switch (vec[i]){
+
+            case INT_t : ret.push_back("INT"); break;
+            case VOID_t : ret.push_back("VOID"); break;
+            case BOOL_t : ret.push_back("BOOL"); break;
+            case BYTE_t : ret.push_back("BYTE"); break;
+            case B_t : ret.push_back("B"); break;
+            case STRING_t : ret.push_back("STRING"); break;
+            default : cout << "shouldnt be here - unexpected token in  modifedTokensToString, in i = " << i << endl;
+                cout << "wrong type is" << vec[i] << endl;
+                exit(0);
+
+                break;
+        }
+    }
+
+    return ret;
+}
+
 
 
 
@@ -37,7 +60,7 @@ void p_stack(stack<Variable*> st){
 
 
         string var = st.top()->name == "" ? "empty string " : st.top()->name;
-        cout << "             " << var << endl;
+        cout << "             " << var << "            " << st.top()->offset << endl;
         tmp = st.top();
         st.pop();
         cpy.push(tmp);
@@ -258,23 +281,23 @@ bool Enum_class::contains(string val){
 
 
         openScope(FUNCTION, f);//no need to open scope in parser
-        for (int i = 0; i < f->paramTypes.size() ; i++)
+        for (int i =  f->paramTypes.size() - 1; i >= 0 ; i--)
         {
-
-            insertVar(f->params[i]);
+            scopes_table[(scopes_table.size()-1 < 0 ? 0 :scopes_table.size()-1)].insertVar(f->params[i]);
         }
 
 
       //  cout << "stack after inserting fun" << endl;
         //p_stack(scopes_table[(scopes_table.size()-1 < 0 ? 0 :scopes_table.size()-1)].local_table);
 
-        
+
 	}
 
 
     void Symbol_Table::closeScope(){
 
-
+        //p_sys_stack(scopes_table);
+        //cout << "              .................          " << endl;
 
         endScope();
         stack<Variable*> st = scopes_table[scopes_table.size() -1 < 0 ? 0 : scopes_table.size()-1].local_table;
@@ -314,9 +337,9 @@ bool Enum_class::contains(string val){
                     tmp_function = (Function*)var;
 
                     tokentype_vec.push_back(tmp_function->returnType);
-                    rettype_string = TokensToString(tokentype_vec)[0];
+                    rettype_string = modifiedTokensToString(tokentype_vec)[0];
                     tokentype_vec.pop_back();
-                    string_vec = TokensToString(tmp_function->paramTypes );
+                    string_vec = modifiedTokensToString(tmp_function->paramTypes );
                     func_type_string = makeFunctionType( rettype_string,string_vec);
 
                     printID(tmp_function->name,0,func_type_string);break;

@@ -72,7 +72,7 @@ FuncDecl :		RetType ID  {
 						}
 						Statements RBRACE 
 						{	
-						
+							
 							
 							symbolTable.closeScope();
 							delete $1;
@@ -97,7 +97,8 @@ EnumDecl :		ENUM ID {
 							curEnumClass = new Enum_class("enum " + $2->name);
 							delete $2;
 							
-						} LBRACE EnumeratorList RBRACE SC 					
+						} LBRACE EnumeratorList RBRACE SC 	
+							//TODO ceck with offset
 						{symbolTable.insertVar(curEnumClass);};
 
 RetType :		Type 														
@@ -123,18 +124,15 @@ FormalDecl :	Type ID
 							$2->type = $1->type;
 						
 						}
-				| EnumType {
-				
+				| EnumType ID 														
+						{
 							auto tmp = (Enum_class*)$1;
 							if(!symbolTable.CheckIfEnumInGlobalScope(tmp)){
 							//check this
 							errorUndef(yylineno,$1->name);
 							delete $1;
 							exit(0);
-						   } 
-						   } ID 														
-						{
-							
+							}
 							curFunc->addParam(new Enum_var(ENUM_t,$2->name,0,"",$1->name));
 							$2->type = $1->type;
 						
@@ -300,10 +298,14 @@ Statement :		LBRACE {
 								exit(0);
 							}
 						}
-				| IF LPAREN checkBoolExp RPAREN Statement 									
+				| IF LPAREN checkBoolExp RPAREN OPENORMAL  Statement CLOSE 									
 						{
 						}
-				| IF LPAREN checkBoolExp  RPAREN Statement ELSE Statement 	
+				| IF LPAREN checkBoolExp   RPAREN OPENORMAL
+							
+							Statement CLOSE
+							ELSE OPENORMAL
+							Statement CLOSE
 						{}
 				| WHILE LPAREN checkBoolExp 
 				{
@@ -588,6 +590,10 @@ Exp :			LPAREN Exp RPAREN
 							delete $2;
 							$$ = new_int;
 						};
+						
+						
+OPENORMAL					{symbolTable.openScope(NORMAL);};
+CLOSE:						{symbolTable.closeScope();};
 
 
 %%
@@ -596,25 +602,26 @@ Exp :			LPAREN Exp RPAREN
 
 int main()
 {
-	/*
-		opening the global scope and adding the print and printi functions.
-		no need top open scopes for those func , therfor we added them as vars
-	
-	*/
+
 	symbolTable.openScope(GLOBAL);
 	curFunc = new Function("print", VOID_t);
 	Variable* dummy = new Variable(STRING_t);
 	curFunc->addParam(dummy);
-	symbolTable.insertVar(curFunc);
+	symbolTable.insertFunc(curFunc);
+	symbolTable.scopes_table.pop_back();
+	symbolTable.offset_stack.pop();
+	
 	curFunc = new Function("printi", VOID_t);
 	dummy = new Variable(INT_t,"");
 	curFunc->addParam(dummy);
-	symbolTable.insertVar(curFunc);
+	symbolTable.insertFunc(curFunc);
+	symbolTable.scopes_table.pop_back();
+	symbolTable.offset_stack.pop();
 	
 	yyparse();
 	
 	
-	//symbolTable.p_sys_stack(symbolTable.scopes_table);
+	
 	
 	/*checking if main exsists*/
 	Function* main_func = (Function*)symbolTable.getVar("main");
@@ -622,6 +629,8 @@ int main()
 		errorMainMissing();
 		return 0;
 	}
+	
+	symbolTable.closeScope();
 
 
     return 0;
