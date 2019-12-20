@@ -1,0 +1,10 @@
+
+*.db
+
+*.opendb
+
+*.ipch
+
+*.json
+
+*.sqlite
