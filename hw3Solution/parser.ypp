@@ -159,6 +159,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 				| Type ID SC 														
 
 						{	
+						
 							Variable* var = symbolTable.getVar($2->name);
 							if(var != nullptr){
 								cout<< "\t\t in rule: Type ID SC 	, line 164 in parser" << endl << "new var name = " << var->name <<endl;
@@ -169,6 +170,8 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							}
 							var = new Variable($1->type,$2->name);
 							symbolTable.insertVar(var);
+						//	symbolTable.p_sys_stack(symbolTable.scopes_table);
+							
 
 
 							
@@ -223,8 +226,11 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							var = new Variable($1->type,$2->name);
 							//var->value = $4->value;						
 							symbolTable.insertVar(var);
+							//cout << "added : " << $2->name << endl;
+							//symbolTable.p_sys_stack(symbolTable.scopes_table);
+							//cout << endl;
 
-							cout<< "\t\t in rule: Type ID ASSIGN Exp SC 	, line 223 in parser" << endl << "new var name = " << var->name <<endl;
+						//	cout<< "\t\t in rule: Type ID ASSIGN Exp SC 	, line 223 in parser" << endl << "new var name = " << var->name <<endl;
 
 							//symbolTable.p_sys_stack(symbolTable.scopes_table);
 
@@ -302,15 +308,15 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 								exit(0);
 							}
 						}
-				| IF LPAREN checkBoolExp RPAREN Statement   									
+				| IF LPAREN checkBoolExp RPAREN OPENORMAL Statement CLOSE  									
 						{
 						}
-				| IF LPAREN checkBoolExp   RPAREN 
+				| IF LPAREN checkBoolExp   RPAREN OPENORMAL
 							
-							Statement 
-							ELSE 
-							{ /*symbolTable.p_sys_stack(symbolTable.scopes_table); */}
-							Statement 
+							Statement CLOSE
+							ELSE OPENORMAL
+						
+							Statement CLOSE
 						{}
 				| WHILE LPAREN checkBoolExp 
 				{
@@ -363,8 +369,8 @@ Call :			ID LPAREN {ParamListStack.push(vector<Node*>()); } ExpList RPAREN
 							callee->ValidateParameters(vec);
 							$$ = new Node(callee->returnType);
 
-							for(int i = 0; i< vec.size() ; ++i)
-								delete vec[i];	
+							//for(int i = 0; i< vec.size() ; ++i)
+							//	delete vec[i];	
 							ParamListStack.pop();
 
 						}
@@ -629,12 +635,13 @@ int main()
 	
 	
 	/*checking if main exsists*/
-	Function* main_func = (Function*)symbolTable.getVar("main");
+	/*Function* main_func = (Function*)symbolTable.getVar("main");
 	if (main_func == nullptr || main_func->type != FUNCTION_t || main_func->paramTypes.size()!= 0 || main_func->returnType != VOID_t){
 		errorMainMissing();
 		return 0;
-	}
+	}*/
 	
+	//symbolTable.p_sys_stack(symbolTable.scopes_table);
 	symbolTable.closeScope();
 
 

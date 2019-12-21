@@ -1,12 +1,11 @@
-
+void printOk(bool isOk) {
+    if (isOk) print("ok");
+}
 
 void main()
 {
-     bool c = true;
-    if (not c) {
-        int x = 6;
-        printi(x);
-    }
-    else
-        {int z;}
+    int x = 4;
+    byte y = 100 b;
+    printOk(x>y);
+    int z;
 }

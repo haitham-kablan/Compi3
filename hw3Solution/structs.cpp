@@ -1,11 +1,16 @@
 #include "structs.hpp"
-vector<string> TokensToString(vector<TokenType>& vec){
+vector<string> TokensToString(vector<TokenType>& vec , vector<Variable*> params){
+
+    Enum_var* tmp ;
     vector<string> ret = vector<string>();
     for ( int i = 0; i < vec.size() ; i++)
     {
         switch (vec[i]){
 
             case INT_t : ret.push_back("INT_t"); break;
+            case ENUM_t :
+                tmp = (Enum_var*)params[i];
+                ret.push_back(tmp->enum_type); break;
             case VOID_t : ret.push_back("VOID_t"); break;
             case BOOL_t : ret.push_back("BOOL_t"); break;
             case BYTE_t : ret.push_back("BYTE_t"); break;
@@ -22,13 +27,17 @@ vector<string> TokensToString(vector<TokenType>& vec){
     return ret;
 }
 
-vector<string> modifiedTokensToString(vector<TokenType>& vec){
+vector<string> modifiedTokensToString(vector<TokenType>& vec , vector<Variable*> params){
     vector<string> ret = vector<string>();
+    Enum_var* tmp ;
     for ( int i = 0; i < vec.size() ; i++)
     {
         switch (vec[i]){
 
             case INT_t : ret.push_back("INT"); break;
+            case ENUM_t :
+                tmp = (Enum_var*)params[i];
+                ret.push_back(tmp->enum_type); break;
             case VOID_t : ret.push_back("VOID"); break;
             case BOOL_t : ret.push_back("BOOL"); break;
             case BYTE_t : ret.push_back("BYTE"); break;
@@ -118,7 +127,7 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
 
 	void Function::ValidateParameters(vector<Node*>& callerParams) {
 		if (callerParams.size() != paramTypes.size()) {
-            auto tmp = TokensToString(paramTypes);
+            auto tmp = TokensToString(paramTypes,params);
             errorPrototypeMismatch(yylineno, name, tmp);
 			exit(0);
 		}
@@ -126,7 +135,7 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
 		for (int i = 0; i < paramTypes.size(); i++) {
 
             if(!(paramTypes[i] == (callerParams)[i]->type || ((callerParams)[i]->type == BYTE_t && paramTypes[i] == INT_t))){
-                auto tmp = TokensToString(paramTypes);
+                auto tmp = TokensToString(paramTypes,params);
                 errorPrototypeMismatch(yylineno, name, tmp );
 				exit(0);
             }
@@ -257,7 +266,7 @@ bool Enum_class::contains(string val){
         offset_stack.push(offset_stack.empty() ? 0 : offset_stack.top());
 
 
-		p_sys_stack(scopes_table);
+		//p_sys_stack(scopes_table);
 
 
 
@@ -267,6 +276,9 @@ bool Enum_class::contains(string val){
 
         scopes_table[(scopes_table.size()-1 < 0 ? 0 :scopes_table.size()-1)].insertVar(var);
 
+        if(var->type == ENUM_CLASS_t){
+            return;
+        }
         int last_offset = offset_stack.top(); 
         offset_stack.pop(); 
         offset_stack.push(1 + last_offset); 
@@ -301,10 +313,10 @@ bool Enum_class::contains(string val){
 
     void Symbol_Table::closeScope(){
 
-        p_sys_stack(scopes_table);
-        cout << "              .................          " << endl;
+        //p_sys_stack(scopes_table);
+        //cout << "              .................          " << endl;
 
-		/*
+
         endScope();
         stack<Variable*> st = scopes_table[scopes_table.size() -1 < 0 ? 0 : scopes_table.size()-1].local_table;
         stack<Variable*> cpy = stack<Variable*>();
@@ -322,6 +334,7 @@ bool Enum_class::contains(string val){
         string func_type_string;
         string rettype_string;
         vector<string> string_vec= vector<string>();
+
         vector<TokenType> tokentype_vec= vector<TokenType>();
         string enum_name;
        while(!cpy.empty()){
@@ -345,9 +358,9 @@ bool Enum_class::contains(string val){
                     tmp_function = (Function*)var;
 
                     tokentype_vec.push_back(tmp_function->returnType);
-                    rettype_string = modifiedTokensToString(tokentype_vec)[0];
+                    rettype_string = modifiedTokensToString(tokentype_vec,tmp_function->params)[0];
                     tokentype_vec.pop_back();
-                    string_vec = modifiedTokensToString(tmp_function->paramTypes );
+                    string_vec = ( modifiedTokensToString(tmp_function->paramTypes,tmp_function->params) );
                     func_type_string = makeFunctionType( rettype_string,string_vec);
 
                     printID(tmp_function->name,0,func_type_string);break;
@@ -362,7 +375,7 @@ bool Enum_class::contains(string val){
 
         scopes_table.pop_back();
         offset_stack.pop();
-		*/
+
 
     }
 
