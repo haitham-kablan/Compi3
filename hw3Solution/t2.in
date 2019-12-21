@@ -16,5 +16,5 @@ void main() {
         printi(x);
     }
     else
-        syntax error;
+        {int z;}
 }
