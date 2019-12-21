@@ -204,7 +204,6 @@ Variable* Scope::getVar(string gname){
 
         while(!local_table.empty()){
 
-        //    delete(local_table.top());
             local_table.pop();
         }
     }
@@ -220,12 +219,14 @@ bool Symbol_Table::CheckIfEnumInGlobalScope(Enum_class* cls){
 
 bool Enum_class::contains(string val){
 
+    cout << "seraching for :" << val << endl;
     for (auto i = enum_vals.begin(); i != enum_vals.end() ; ++i) {
-
+    cout << *i << ",";
         if (*i == val){
           return true;
         }
     }
+    cout << endl;
     return false;
 }
 
@@ -378,6 +379,53 @@ bool Enum_class::contains(string val){
 
 
     }
+
+
+
+bool isEnumInScope(Scope sc , string enum_val){
+
+    stack<Variable*> cpy = stack<Variable*>();
+    Variable* tmp;
+    Enum_class* tmp_class;
+    bool found = false;
+
+    while(!sc.local_table.empty()){
+
+        if (sc.local_table.top()->type == ENUM_CLASS_t){
+
+            tmp_class = (Enum_class*)sc.local_table.top();
+            if (tmp_class->contains(enum_val)){
+                found = true;
+            }
+        }
+
+        tmp = sc.local_table.top();
+        sc.local_table.pop();
+        cpy.push(tmp);
+    }
+
+    while(!cpy.empty()){
+
+        tmp = cpy.top();
+        cpy.pop();
+        sc.local_table.push(tmp);
+    }
+
+    return found;
+
+}
+bool Symbol_Table::isThereEnumContains(string enum_val){
+
+    for (auto i= scopes_table.begin(); i != scopes_table.end()  ; i++) {
+
+        if(isEnumInScope(*i,enum_val)){
+            return true;
+        }
+    }
+    return false;
+
+
+}
 
 
 

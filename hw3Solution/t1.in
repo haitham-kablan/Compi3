@@ -1,11 +1,11 @@
-void printOk(bool isOk) {
-    if (isOk) print("ok");
+enum day {SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATARDAY};
+
+int enumParam(enum day d){
+    return (int) d;
 }
 
 void main()
 {
-    int x = 4;
-    byte y = 100 b;
-    printOk(x>y);
-    int z;
+	enum day x = SUNDAY ;
+  
 }
