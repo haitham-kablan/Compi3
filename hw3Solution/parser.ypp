@@ -161,6 +161,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 						{	
 							Variable* var = symbolTable.getVar($2->name);
 							if(var != nullptr){
+								cout<< "\t\t in rule: Type ID SC 	, line 164 in parser" << endl << "new var name = " << var->name <<endl;
 								errorDef(yylineno, $2->name);
 								delete $1;
 								delete $2;
@@ -168,6 +169,9 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							}
 							var = new Variable($1->type,$2->name);
 							symbolTable.insertVar(var);
+
+
+							
 
 							delete $1;
 							delete $2;
@@ -217,10 +221,15 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							
 							
 							var = new Variable($1->type,$2->name);
-							var->value = $4->value;						
+							//var->value = $4->value;						
 							symbolTable.insertVar(var);
-							delete $1;
-							delete $2;
+
+							cout<< "\t\t in rule: Type ID ASSIGN Exp SC 	, line 223 in parser" << endl << "new var name = " << var->name <<endl;
+
+							//symbolTable.p_sys_stack(symbolTable.scopes_table);
+
+							//delete $1;
+							//delete $2;
 							
 							
 						}
@@ -300,7 +309,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							
 							Statement 
 							ELSE 
-							{symbolTable.p_sys_stack(symbolTable.scopes_table);}
+							{ /*symbolTable.p_sys_stack(symbolTable.scopes_table); */}
 							Statement 
 						{}
 				| WHILE LPAREN checkBoolExp 
@@ -617,7 +626,6 @@ int main()
 	
 	yyparse();
 	
-	//symbolTable.p_sys_stack(symbolTable.scopes_table);
 	
 	
 	/*checking if main exsists*/
