@@ -140,15 +140,14 @@ FormalDecl :	Type ID
 
 
 EnumeratorList :	Enumerator 											
-						{curEnumClass->enum_vals.push_back($1->name);
-						  delete $1;
+						{
 						}
 				| EnumeratorList COMMA Enumerator 									
 						{};
 
 Enumerator :		ID 															
-						{$$ = new Node(Enumerator_t,$1->name);
-						delete $1;
+						{curEnumClass->enum_vals.push_back($1->name);
+						  delete $1;
 						};
 
 Statements :	Statement 													
@@ -156,14 +155,10 @@ Statements :	Statement
 				| Statements Statement 												
 						{};
 
-Statement :		LBRACE {
-					symbolTable.openScope(NORMAL);
-				} Statements RBRACE {
-					symbolTable.closeScope();
-						}
+Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 				| Type ID SC 														
 
-						{
+						{	
 							Variable* var = symbolTable.getVar($2->name);
 							if(var != nullptr){
 								errorDef(yylineno, $2->name);
@@ -298,21 +293,23 @@ Statement :		LBRACE {
 								exit(0);
 							}
 						}
-				| IF LPAREN checkBoolExp RPAREN OPENORMAL  Statement CLOSE 									
+				| IF LPAREN checkBoolExp RPAREN Statement   									
 						{
 						}
-				| IF LPAREN checkBoolExp   RPAREN OPENORMAL
+				| IF LPAREN checkBoolExp   RPAREN 
 							
-							Statement CLOSE
-							ELSE OPENORMAL
-							Statement CLOSE
+							Statement 
+							ELSE 
+							{symbolTable.p_sys_stack(symbolTable.scopes_table);}
+							Statement 
 						{}
 				| WHILE LPAREN checkBoolExp 
 				{
-					 symbolTable.openScope(LOOP);
+					//TODO stamtent will open the new scope
+					// symbolTable.openScope(LOOP);
 				} RPAREN  Statement 									
 						{
-							symbolTable.closeScope();
+						//	symbolTable.closeScope();
 						 }
 				| BREAK SC 															
 						{
@@ -592,7 +589,7 @@ Exp :			LPAREN Exp RPAREN
 						};
 						
 						
-OPENORMAL					{symbolTable.openScope(NORMAL);};
+OPENORMAL:					{symbolTable.openScope(NORMAL);};
 CLOSE:						{symbolTable.closeScope();};
 
 
@@ -620,7 +617,7 @@ int main()
 	
 	yyparse();
 	
-	
+	//symbolTable.p_sys_stack(symbolTable.scopes_table);
 	
 	
 	/*checking if main exsists*/

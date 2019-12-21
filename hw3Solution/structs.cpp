@@ -299,61 +299,63 @@ bool Enum_class::contains(string val){
         //p_sys_stack(scopes_table);
         //cout << "              .................          " << endl;
 
-        endScope();
-        stack<Variable*> st = scopes_table[scopes_table.size() -1 < 0 ? 0 : scopes_table.size()-1].local_table;
-        stack<Variable*> cpy = stack<Variable*>();
-        Variable* tmp;
-        while(!st.empty()){
-            tmp = st.top();
-            st.pop();
-            cpy.push(tmp);
-        }
-
-        /*now we have the reversed stack*/
-        Enum_var* tmp_var;
-        Enum_class* tmp_class;
-        Function* tmp_function;
-        string func_type_string;
-        string rettype_string;
-        vector<string> string_vec= vector<string>();
-        vector<TokenType> tokentype_vec= vector<TokenType>();
-        while(!cpy.empty()){
-
-            Variable* var = cpy.top();
-            switch (var->type){
-                case INT_t : printID(var->name, var->offset, "INT"); break;
-                case BOOL_t : printID(var->name, var->offset, "BOOL"); break;
-                case BYTE_t : printID(var->name, var->offset, "BYTE"); break;
-                case ENUM_t :
-                    tmp_var = (Enum_var*)var;
-                    printID(var->name, var->offset,tmp_var->enum_type ); break;
-
-                case ENUM_CLASS_t:
-                    tmp_class = (Enum_class*)var;
-                    printEnumType(tmp_class->name, tmp_class->enum_vals); break;
-
-
-                case FUNCTION_t:
-                    tmp_function = (Function*)var;
-
-                    tokentype_vec.push_back(tmp_function->returnType);
-                    rettype_string = modifiedTokensToString(tokentype_vec)[0];
-                    tokentype_vec.pop_back();
-                    string_vec = modifiedTokensToString(tmp_function->paramTypes );
-                    func_type_string = makeFunctionType( rettype_string,string_vec);
-
-                    printID(tmp_function->name,0,func_type_string);break;
-                case STRING_t: cout << "i dont know this"<< endl; break;
-                default : "problem in ending scope" ; break;
-
-
-            }
-            cpy.pop();
-        }
-
-
-        scopes_table.pop_back();
-        offset_stack.pop();
+//        endScope();
+//        stack<Variable*> st = scopes_table[scopes_table.size() -1 < 0 ? 0 : scopes_table.size()-1].local_table;
+//        stack<Variable*> cpy = stack<Variable*>();
+//        Variable* tmp;
+//        while(!st.empty()){
+//            tmp = st.top();
+//            st.pop();
+//            cpy.push(tmp);
+//        }
+//
+//        /*now we have the reversed stack*/
+//        Enum_var* tmp_var;
+//        Enum_class* tmp_class;
+//        Function* tmp_function;
+//        string func_type_string;
+//        string rettype_string;
+//        vector<string> string_vec= vector<string>();
+//        vector<TokenType> tokentype_vec= vector<TokenType>();
+//        string enum_name;
+//        while(!cpy.empty()){
+//
+//            Variable* var = cpy.top();
+//            switch (var->type){
+//                case INT_t : printID(var->name, var->offset, "INT"); break;
+//                case BOOL_t : printID(var->name, var->offset, "BOOL"); break;
+//                case BYTE_t : printID(var->name, var->offset, "BYTE"); break;
+//                case ENUM_t :
+//                    tmp_var = (Enum_var*)var;
+//                    printID(var->name, var->offset,tmp_var->enum_type ); break;
+//
+//                case ENUM_CLASS_t:
+//                    tmp_class = (Enum_class*)var;
+//                    enum_name = tmp_class->name.substr(5, tmp_class->name.size()-1);
+//                    printEnumType(enum_name, tmp_class->enum_vals); break;
+//
+//
+//                case FUNCTION_t:
+//                    tmp_function = (Function*)var;
+//
+//                    tokentype_vec.push_back(tmp_function->returnType);
+//                    rettype_string = modifiedTokensToString(tokentype_vec)[0];
+//                    tokentype_vec.pop_back();
+//                    string_vec = modifiedTokensToString(tmp_function->paramTypes );
+//                    func_type_string = makeFunctionType( rettype_string,string_vec);
+//
+//                    printID(tmp_function->name,0,func_type_string);break;
+//                case STRING_t: cout << "i dont know this"<< endl; break;
+//                default : "problem in ending scope" ; break;
+//
+//
+//            }
+//            cpy.pop();
+//        }
+//
+//
+//        scopes_table.pop_back();
+//        offset_stack.pop();
 
 
     }
