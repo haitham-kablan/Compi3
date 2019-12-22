@@ -41,7 +41,7 @@ typedef enum tokentype_t { VOID_t ,Enumerator_t, INT_t , ENUM_t , ENUM_CLASS_t,
      RBRACE_t , ASSIGN_t , COMMENT_t, ID_t, NUM_t, STRING_t ,ADDOPS_t, MULTOPS_t ,EQUALOP_t, RELATIONOP_t , FUNCTION_t , UNDEFYET_t} TokenType;
 
 
-vector<string> TokensToString(vector<TokenType>& vec);
+
 
 /******************************************************************************/
 
@@ -111,7 +111,7 @@ class Function : public Variable{
 
 
 
-
+vector<string> TokensToString(vector<TokenType>& vec , vector<Variable*> params);
 
 
 class Scope{
@@ -148,6 +148,7 @@ public:
     void closeScope();
 	bool CheckIfEnumInGlobalScope(Enum_class* cls);
 	void p_sys_stack(vector<Scope> sys);
+	bool isThereEnumContains(string enum_val);
     
 };
 

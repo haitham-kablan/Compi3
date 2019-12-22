@@ -98,7 +98,7 @@ EnumDecl :		ENUM ID {
 							delete $2;
 							
 						} LBRACE EnumeratorList RBRACE SC 	
-							//TODO ceck with offset
+							
 						{symbolTable.insertVar(curEnumClass);};
 
 RetType :		Type 														
@@ -128,7 +128,6 @@ FormalDecl :	Type ID
 						{
 							auto tmp = (Enum_class*)$1;
 							if(!symbolTable.CheckIfEnumInGlobalScope(tmp)){
-							//check this
 							errorUndef(yylineno,$1->name);
 							delete $1;
 							exit(0);
@@ -159,9 +158,10 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 				| Type ID SC 														
 
 						{	
+						
 							Variable* var = symbolTable.getVar($2->name);
 							if(var != nullptr){
-								cout<< "\t\t in rule: Type ID SC 	, line 164 in parser" << endl << "new var name = " << var->name <<endl;
+							
 								errorDef(yylineno, $2->name);
 								delete $1;
 								delete $2;
@@ -169,8 +169,6 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							}
 							var = new Variable($1->type,$2->name);
 							symbolTable.insertVar(var);
-
-
 							
 
 							delete $1;
@@ -190,7 +188,6 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							var = new Enum_var(ENUM_t,$2->name,0,"",$1->name);
 							symbolTable.insertVar(var);
 
-							delete $1;
 							delete $2;
 						
 						
@@ -221,15 +218,10 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							
 							
 							var = new Variable($1->type,$2->name);
-							//var->value = $4->value;						
+													
 							symbolTable.insertVar(var);
 
-							cout<< "\t\t in rule: Type ID ASSIGN Exp SC 	, line 223 in parser" << endl << "new var name = " << var->name <<endl;
 
-							//symbolTable.p_sys_stack(symbolTable.scopes_table);
-
-							//delete $1;
-							//delete $2;
 							
 							
 						}
@@ -241,16 +233,20 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							
 								exit(0);
 								}
+								
+								
 							}
 				ASSIGN Exp { 
+									cout << $4->name << $2->name << endl;
 								auto tmp = (Enum_class*)$1;
 								if (! tmp->contains($4->name) ){
-											errorUndefEnumValue(yylineno,$4->name);
+											errorUndefEnumValue(yylineno,$2->name);
 											delete $2;
 											
 											exit(0);		
 								
 								}
+								
 							}
 				SC{
 								Enum_var* new_var = new Enum_var(ENUM_t,$2->name,0,$4->value,$1->name);
@@ -277,13 +273,13 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							var->value = $3->value;
 
 							delete $1;
-							delete $3;
+							
 						}
 				| Call SC 															
 						{}
 				| RETURN SC 														
 						{
-							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1];
+							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1 < 0 ? 0 : symbolTable.scopes_table.size()-1 ];
 							assert(scope.curFunc != nullptr);//grammar makes sure
 							auto f = scope.curFunc;
 							if(f->returnType != VOID_t){
@@ -293,7 +289,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 						}
 				| RETURN Exp SC 													
 						{
-							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1];
+							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1 < 0 ? 0 : symbolTable.scopes_table.size()-1];
 							assert(scope.curFunc != nullptr);//grammar makes sure
 							auto f = scope.curFunc;
 							if(f->returnType != $2->type && (f->returnType != INT_t && $2->type != BYTE_t) ){
@@ -302,27 +298,27 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 								exit(0);
 							}
 						}
-				| IF LPAREN checkBoolExp RPAREN Statement   									
+				| IF LPAREN checkBoolExp RPAREN OPENORMAL Statement CLOSE  									
 						{
 						}
-				| IF LPAREN checkBoolExp   RPAREN 
+				| IF LPAREN checkBoolExp   RPAREN OPENORMAL
 							
-							Statement 
-							ELSE 
-							{ /*symbolTable.p_sys_stack(symbolTable.scopes_table); */}
-							Statement 
+							Statement CLOSE
+							ELSE OPENORMAL
+						
+							Statement CLOSE
 						{}
 				| WHILE LPAREN checkBoolExp 
 				{
-					//TODO stamtent will open the new scope
-					// symbolTable.openScope(LOOP);
+					
+					 symbolTable.openScope(LOOP);
 				} RPAREN  Statement 									
 						{
-						//	symbolTable.closeScope();
+							symbolTable.closeScope();
 						 }
 				| BREAK SC 															
 						{
-							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1];
+							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1 < 0 ? 0 : symbolTable.scopes_table.size()-1];
 							if(!scope.isLoop){
 								errorUnexpectedBreak(yylineno);
 								exit(0);
@@ -330,7 +326,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 						}
 				| CONTINUE SC 														
 						{
-							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1];
+							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1 < 0 ? 0 : symbolTable.scopes_table.size()-1];
 							if(!scope.isLoop){
 								errorUnexpectedContinue(yylineno);
 								exit(0);
@@ -352,19 +348,12 @@ Call :			ID LPAREN {ParamListStack.push(vector<Node*>()); } ExpList RPAREN
 							if (callee == nullptr || callee->type != FUNCTION_t){
 								delete $1;
 								errorUndefFunc(yylineno, $1->name);
-								
-								for(int i = 0; i< vec.size() ; ++i)
-									delete vec[i];
-								
 								ParamListStack.pop();
 								exit(0);
 							}
 							delete $1;
 							callee->ValidateParameters(vec);
-							$$ = new Node(callee->returnType);
-
-							for(int i = 0; i< vec.size() ; ++i)
-								delete vec[i];	
+							$$ = new Node(callee->returnType);	
 							ParamListStack.pop();
 
 						}
@@ -378,7 +367,6 @@ Call :			ID LPAREN {ParamListStack.push(vector<Node*>()); } ExpList RPAREN
 								exit(0);
 							}
 							delete $1;
-							//check about the delete here 
 							auto tmp = vector<Node*>();
 							callee->ValidateParameters(tmp);
 							$$ = new Node(callee->returnType);
@@ -454,15 +442,31 @@ Exp :			LPAREN Exp RPAREN
 						}
 
 				| ID 																
-					{ Variable* var = symbolTable.getVar($1->name);
-							if(var == nullptr){
+					{ 
+					
+					
+					
+					
+					Variable* var = symbolTable.getVar($1->name);
+							if(  var == nullptr ){
+							
+								if (!symbolTable.isThereEnumContains($1->name)){
+								
 								errorUndef(yylineno, $1->name);
 								delete $1;
 								exit(0);
+								}
 							}
-		
 							
+						if (symbolTable.isThereEnumContains($1->name)){
+						$$ = $1;
+						
+						}
+							else{
 						$$ = var;
+						}
+						
+						//cout <<"*************"<<$$->name <<"***********"<<endl;
 					}
 
 				| Call 																
@@ -629,12 +633,13 @@ int main()
 	
 	
 	/*checking if main exsists*/
-	Function* main_func = (Function*)symbolTable.getVar("main");
+	/*Function* main_func = (Function*)symbolTable.getVar("main");
 	if (main_func == nullptr || main_func->type != FUNCTION_t || main_func->paramTypes.size()!= 0 || main_func->returnType != VOID_t){
 		errorMainMissing();
 		return 0;
-	}
+	}*/
 	
+	//symbolTable.p_sys_stack(symbolTable.scopes_table);
 	symbolTable.closeScope();
 
 
