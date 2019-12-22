@@ -105,7 +105,7 @@ continue 										{
 													return MULTOPS;
 												}
 [a-zA-Z][a-zA-Z0-9]*							{ 
-													yylval = new Node(ID_t, yytext);
+													yylval = new Node(ID_t, yytext,yytext);
 													return ID; 
 												} 
 0|[1-9][0-9]*									{

@@ -178,14 +178,14 @@ Enumerator :		ID
 							Variable* var_as_class = symbolTable.getVar("enum "+$1->name);
 
 
-							cout << "hiiiiii" << endl;
+							
 							if(var != nullptr || symbolTable.isThereEnumContains($1->name) || var_as_class != nullptr || curEnumClass->contains($1->name) || "enum " + $1->name == curEnumClass->name){
 					
 								errorDef(yylineno, $1->name);
 								delete $1;
 								exit(0);
 							}
-							cout << "byyyyyyyyyyee" << endl;
+							
 							
 						curEnumClass->enum_vals.push_back($1->name);
 						  delete $1;
@@ -250,17 +250,13 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							if(var != nullptr || symbolTable.isThereEnumContains($2->name) || var_as_class != nullptr){
 							
 								errorDef(yylineno, $2->name);
-								delete $1;
-								delete $2;
-								delete $4;
+								
 								exit(0);
 							}
 							if($1->type != $4->type && (!($1->type == INT_t  && $4->type == BYTE_t  )) )
 							{
 								errorMismatch(yylineno);
-								delete $1;
-								delete $2;
-								delete $4;
+								
 								exit(0);
 							}
 							
@@ -309,7 +305,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							if(var == nullptr ){
 								errorUndef(yylineno, $2->name);
 								delete $1;
-								delete $3;
+								
 								exit(0);
 							}
 							
@@ -317,7 +313,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							
 								errorMismatch(yylineno);
 								delete $1;
-								delete $3;
+								
 								exit(0);
 							}
 							
@@ -632,7 +628,7 @@ Exp :			LPAREN Exp RPAREN
 				| LPAREN Type	RPAREN Exp 
 				
 						{	
-						/*if ( $2->type != INT_t){
+						if ( $2->type != INT_t){
 								delete $2;
 								errorMismatch(yylineno);
 								exit(0);
@@ -652,20 +648,13 @@ Exp :			LPAREN Exp RPAREN
 								exit(0);
 							}
 							
-							if (enum_var->type != ENUM_t && !(symbolTable.isThereEnumContains($4->name))){
-								delete $2;
-								
-								errorMismatch(yylineno);
-								exit(0);
-							}
-							
 							auto enum_var_casted = enum_var==nullptr ? nullptr : (Enum_var*)enum_var; 
 							string enum_var_name = enum_var==nullptr ? "" : enum_var_casted->name;
 							int enum_var_offset = enum_var==nullptr ? 0 : enum_var_casted->offset; 
 							string enum_var_value = enum_var==nullptr ? "" : enum_var_casted->value; 
 							Variable* new_int = new Variable(INT_t,enum_var_name,enum_var_offset,enum_var_value);
 							delete $2;
-							$$ = new_int;*/
+							$$ = new_int;
 						};
 						
 						
