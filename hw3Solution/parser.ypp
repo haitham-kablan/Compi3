@@ -225,25 +225,20 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							
 							
 						}
-				| EnumType ID {
+				| EnumType ID ASSIGN Exp { 
 								Variable* var = symbolTable.getVar($2->name);
 								if(var != nullptr){
-								errorDef(yylineno, $2->name);
-								delete $2;
-							
-								exit(0);
+									errorDef(yylineno, $2->name);
+									delete $2;
+									exit(0);
 								}
-								
-								
-							}
-				ASSIGN Exp { 
-									cout << $4->name << $2->name << endl;
+								//cout << $4->name << $2->name << endl;
 								auto tmp = (Enum_class*)$1;
 								if (! tmp->contains($4->name) ){
-											errorUndefEnumValue(yylineno,$2->name);
-											delete $2;
+									errorUndefEnumValue(yylineno,$2->name);
+									delete $2;
 											
-											exit(0);		
+									exit(0);		
 								
 								}
 								
@@ -352,7 +347,7 @@ Call :			ID LPAREN {ParamListStack.push(vector<Node*>()); } ExpList RPAREN
 								exit(0);
 							}
 							delete $1;
-							callee->ValidateParameters(vec);
+							callee->ValidateParameters(vec,symbolTable);
 							$$ = new Node(callee->returnType);	
 							ParamListStack.pop();
 
@@ -368,7 +363,7 @@ Call :			ID LPAREN {ParamListStack.push(vector<Node*>()); } ExpList RPAREN
 							}
 							delete $1;
 							auto tmp = vector<Node*>();
-							callee->ValidateParameters(tmp);
+							callee->ValidateParameters(tmp,symbolTable);
 							$$ = new Node(callee->returnType);
 
 						};
@@ -443,10 +438,6 @@ Exp :			LPAREN Exp RPAREN
 
 				| ID 																
 					{ 
-					
-					
-					
-					
 					Variable* var = symbolTable.getVar($1->name);
 							if(  var == nullptr ){
 							
@@ -458,12 +449,12 @@ Exp :			LPAREN Exp RPAREN
 								}
 							}
 							
-						if (symbolTable.isThereEnumContains($1->name)){
-						$$ = $1;
+						if (symbolTable.isThereEnumContains($1->name) && var == nullptr){
+							$$ = $1;
 						
 						}
-							else{
-						$$ = var;
+						else{
+							$$ = var;
 						}
 						
 						//cout <<"*************"<<$$->name <<"***********"<<endl;
@@ -633,11 +624,11 @@ int main()
 	
 	
 	/*checking if main exsists*/
-	/*Function* main_func = (Function*)symbolTable.getVar("main");
+	Function* main_func = (Function*)symbolTable.getVar("main");
 	if (main_func == nullptr || main_func->type != FUNCTION_t || main_func->paramTypes.size()!= 0 || main_func->returnType != VOID_t){
 		errorMainMissing();
 		return 0;
-	}*/
+	}
 	
 	//symbolTable.p_sys_stack(symbolTable.scopes_table);
 	symbolTable.closeScope();

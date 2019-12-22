@@ -125,7 +125,7 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
 		params.push_back(param);
 	}
 
-	void Function::ValidateParameters(vector<Node*>& callerParams) {
+	void Function::ValidateParameters(vector<Node*>& callerParams , Symbol_Table table) {
 		if (callerParams.size() != paramTypes.size()) {
             auto tmp = TokensToString(paramTypes,params);
             errorPrototypeMismatch(yylineno, name, tmp);
@@ -135,9 +135,18 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
 		for (int i = 0; i < paramTypes.size(); i++) {
 
             if(!(paramTypes[i] == (callerParams)[i]->type || ((callerParams)[i]->type == BYTE_t && paramTypes[i] == INT_t))){
+
+
                 auto tmp = TokensToString(paramTypes,params);
                 errorPrototypeMismatch(yylineno, name, tmp );
 				exit(0);
+            }
+
+            if (paramTypes[i]->type == ENUM_t){
+                    Enum_class* tmp = table.getVar(enum_type);
+                    if (!tmp.contains((callerParams)[i]->name)){
+
+                    }
             }
         }
 	}
@@ -219,14 +228,16 @@ bool Symbol_Table::CheckIfEnumInGlobalScope(Enum_class* cls){
 
 bool Enum_class::contains(string val){
 
-    cout << "seraching for :" << val << endl;
+   // cout << "seraching for :" << val << endl;
     for (auto i = enum_vals.begin(); i != enum_vals.end() ; ++i) {
-    cout << *i << ",";
+    //cout << *i << ",";
         if (*i == val){
           return true;
         }
     }
     cout << endl;
+
+   // cout << "done contains 231" << endl;
     return false;
 }
 
@@ -396,6 +407,7 @@ bool isEnumInScope(Scope sc , string enum_val){
             tmp_class = (Enum_class*)sc.local_table.top();
             if (tmp_class->contains(enum_val)){
                 found = true;
+                break;
             }
         }
 
@@ -411,6 +423,7 @@ bool isEnumInScope(Scope sc , string enum_val){
         sc.local_table.push(tmp);
     }
 
+   // cout << "done 416" << endl;
     return found;
 
 }
@@ -419,13 +432,17 @@ bool Symbol_Table::isThereEnumContains(string enum_val){
     for (auto i= scopes_table.begin(); i != scopes_table.end()  ; i++) {
 
         if(isEnumInScope(*i,enum_val)){
+          //  cout << "done contains 426" << endl;
             return true;
         }
     }
+   // cout << "done contains 428" << endl;
     return false;
 
 
 }
+
+
 
 
 
