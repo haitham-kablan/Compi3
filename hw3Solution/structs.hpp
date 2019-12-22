@@ -94,18 +94,18 @@ public:
 
 class Function : public Variable{
 
-    public:
-    TokenType returnType;
+public:
+	TokenType returnType;
 	vector<TokenType> paramTypes;
-    vector<Variable*> params;
+	vector<Variable*> params;
 
-    Function(string name , TokenType returnType);
+	Function(string name , TokenType returnType);
 
-    void addParam(Variable* param);
+	void addParam(Variable* param);
 
 
 
-	void ValidateParameters(vector<Node*>& callerParams);
+	void ValidateParameters(vector<Node*>& callerParams,Symbol_Table table);
 
 };
 
@@ -150,6 +150,24 @@ public:
 	void p_sys_stack(vector<Scope> sys);
 	bool isThereEnumContains(string enum_val);
     
+};
+
+
+class Function : public Variable{
+
+public:
+	TokenType returnType;
+	vector<TokenType> paramTypes;
+	vector<Variable*> params;
+
+	Function(string name , TokenType returnType);
+
+	void addParam(Variable* param);
+
+
+
+	void ValidateParameters(vector<Node*>& callerParams,Symbol_Table table);
+
 };
 
 #endif //COMPI_3_STRUCTS_HPP
