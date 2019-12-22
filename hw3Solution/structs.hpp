@@ -77,14 +77,11 @@ class Enum_class : public Variable{
 
 public:
 	vector<string> enum_vals;
-
 	Enum_class(string name) : Variable(ENUM_CLASS_t,name,0,"") , enum_vals() {};
-
     bool contains(string val);
 };
 
 class Enum_var : public Variable {
-
 public:
 
 	string enum_type;
@@ -100,11 +97,7 @@ public:
 	vector<Variable*> params;
 
 	Function(string name , TokenType returnType);
-
 	void addParam(Variable* param);
-
-
-
 	void ValidateParameters(vector<Node*>& callerParams,Symbol_Table table);
 
 };

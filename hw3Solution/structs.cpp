@@ -230,16 +230,12 @@ bool Symbol_Table::CheckIfEnumInGlobalScope(Enum_class* cls){
 
 bool Enum_class::contains(string val){
 
-   // cout << "seraching for :" << val << endl;
     for (auto i = enum_vals.begin(); i != enum_vals.end() ; ++i) {
-    //cout << *i << ",";
-        if (*i == val){
+		if (*i == val){
           return true;
         }
     }
-    cout << endl;
-	
-   // cout << "done contains 231" << endl;
+
     return false;
 }
 
