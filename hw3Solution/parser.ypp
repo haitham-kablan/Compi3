@@ -100,6 +100,7 @@ EnumDecl :		ENUM ID {
 								exit(0);
 							}
 							
+							
 							curEnumClass = new Enum_class("enum " + $2->name);
 							delete $2;
 							
@@ -164,23 +165,31 @@ FormalDecl :	Type ID
 
 EnumeratorList :	Enumerator 											
 						{
+						
 						}
 				| EnumeratorList COMMA Enumerator 									
 						{};
 
 Enumerator :		ID 															
 						{
-						Variable* var = symbolTable.getVar($1->name);
+						
+							Variable* var = symbolTable.getVar($1->name);
+						
 							Variable* var_as_class = symbolTable.getVar("enum "+$1->name);
+
+
+							cout << "hiiiiii" << endl;
 							if(var != nullptr || symbolTable.isThereEnumContains($1->name) || var_as_class != nullptr || curEnumClass->contains($1->name) || "enum " + $1->name == curEnumClass->name){
-							
+					
 								errorDef(yylineno, $1->name);
-								
 								delete $1;
 								exit(0);
 							}
+							cout << "byyyyyyyyyyee" << endl;
+							
 						curEnumClass->enum_vals.push_back($1->name);
 						  delete $1;
+						 
 						};
 
 Statements :	Statement 													
@@ -686,6 +695,7 @@ int main()
 	symbolTable.scopes_table.pop_back();
 	symbolTable.offset_stack.pop();
 	
+
 	yyparse();
 	
 	
@@ -696,7 +706,6 @@ int main()
 		errorMainMissing();
 		return 0;
 	}
-	
 	
 	symbolTable.closeScope();
 

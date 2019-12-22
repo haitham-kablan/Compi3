@@ -238,7 +238,7 @@ bool Enum_class::contains(string val){
         }
     }
     cout << endl;
-
+	
    // cout << "done contains 231" << endl;
     return false;
 }
@@ -440,20 +440,20 @@ bool isEnumInScope(Scope sc , string enum_val){
         sc.local_table.push(tmp);
     }
 
-   // cout << "done 416" << endl;
     return found;
 
 }
 bool Symbol_Table::isThereEnumContains(string enum_val){
 
+	
+
     for (auto i= scopes_table.begin(); i != scopes_table.end()  ; i++) {
 
         if(isEnumInScope(*i,enum_val)){
-          //  cout << "done contains 426" << endl;
             return true;
         }
+		
     }
-   // cout << "done contains 428" << endl;
     return false;
 
 
