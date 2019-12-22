@@ -127,7 +127,7 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
 
 	void Function::ValidateParameters(vector<Node*>& callerParams , Symbol_Table table) {
 		if (callerParams.size() != paramTypes.size()) {
-            auto tmp = TokensToString(paramTypes,params);
+            auto tmp = modifiedTokensToString(paramTypes,params);
             errorPrototypeMismatch(yylineno, name, tmp);
 			exit(0);
 		}
@@ -137,7 +137,7 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
             if(!(paramTypes[i] == (callerParams)[i]->type || ((callerParams)[i]->type == BYTE_t && paramTypes[i] == INT_t))){
 
 
-                auto tmp = TokensToString(paramTypes,params);
+                auto tmp = modifiedTokensToString(paramTypes,params);
                 errorPrototypeMismatch(yylineno, name, tmp );
 				exit(0);
             }
@@ -146,7 +146,7 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
                     Enum_var* var = (Enum_var*)params[i];
                     Enum_class* tmp = (Enum_class*)table.getVar(var->enum_type);
                     if (!tmp->contains((callerParams)[i]->name)){
-                         auto tmp = TokensToString(paramTypes,params);
+                         auto tmp = modifiedTokensToString(paramTypes,params);
                          errorPrototypeMismatch(yylineno, name, tmp );
                         exit(0);
                     }
@@ -193,7 +193,6 @@ Variable* Scope::getVar(string gname){
         while(!local_table.empty()){
             if(local_table.top()->name == gname){
                 foundVar = local_table.top();
-
                 break;
             }
             curVar = local_table.top();
@@ -313,7 +312,7 @@ bool Enum_class::contains(string val){
 
 
         openScope(FUNCTION, f);//no need to open scope in parser
-        for (int i =  f->paramTypes.size() - 1; i >= 0 ; i--)
+        for (int i = 0; i < f->paramTypes.size(); i++)
         {
             scopes_table[(scopes_table.size()-1 < 0 ? 0 :scopes_table.size()-1)].insertVar(f->params[i]);
         }

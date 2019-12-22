@@ -254,7 +254,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 						{
 							Variable* var = symbolTable.getVar($1->name);
 							if(var == nullptr ){
-								errorDef(yylineno, $2->name);
+								errorUndef(yylineno, $2->name);
 								delete $1;
 								delete $3;
 								exit(0);
@@ -287,7 +287,7 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 							auto& scope = symbolTable.scopes_table[symbolTable.scopes_table.size()-1 < 0 ? 0 : symbolTable.scopes_table.size()-1];
 							assert(scope.curFunc != nullptr);//grammar makes sure
 							auto f = scope.curFunc;
-							if(f->returnType != $2->type && (f->returnType != INT_t && $2->type != BYTE_t) ){
+							if(f->returnType != $2->type && !(f->returnType == INT_t && $2->type == BYTE_t) ){
 								errorMismatch(yylineno);
 								delete $2;
 								exit(0);
@@ -337,13 +337,15 @@ checkBoolExp :     Exp {
 					}
 Call :			ID LPAREN {ParamListStack.push(vector<Node*>()); } ExpList RPAREN 										
 						{
+						
 							Function* callee = (Function*)symbolTable.getVar($1->name);
 							auto& vec = ParamListStack.top();
 
 							if (callee == nullptr || callee->type != FUNCTION_t){
-								delete $1;
+								
 								errorUndefFunc(yylineno, $1->name);
 								ParamListStack.pop();
+								delete $1;
 								exit(0);
 							}
 							delete $1;
@@ -354,13 +356,16 @@ Call :			ID LPAREN {ParamListStack.push(vector<Node*>()); } ExpList RPAREN
 						}
 
 				| ID LPAREN RPAREN 													
-						{
+						{	
 							Function* callee = (Function*)symbolTable.getVar($1->name);
+
 							if (callee == nullptr || callee->type != FUNCTION_t){
-								delete $1;
+								
 								errorUndefFunc(yylineno, $1->name);
+								delete $1;
 								exit(0);
 							}
+
 							delete $1;
 							auto tmp = vector<Node*>();
 							callee->ValidateParameters(tmp,symbolTable);
