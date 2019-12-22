@@ -327,16 +327,20 @@ bool Enum_class::contains(string val){
 
     void Symbol_Table::closeScope(){
 
-        //p_sys_stack(scopes_table);
-        //cout << "              .................          " << endl;
-
 
         endScope();
         stack<Variable*> st = scopes_table[scopes_table.size() -1 < 0 ? 0 : scopes_table.size()-1].local_table;
         stack<Variable*> cpy = stack<Variable*>();
+        stack<Enum_class*> enums = stack<Enum_class*>();
         Variable* tmp;
         while(!st.empty()){
+
             tmp = st.top();
+            if(tmp->type == ENUM_CLASS_t){
+                enums.push((Enum_class*)tmp);
+                st.pop();
+                continue;
+            }
             st.pop();
             cpy.push(tmp);
         }
@@ -362,10 +366,10 @@ bool Enum_class::contains(string val){
                     tmp_var = (Enum_var*)var;
                     printID(var->name, var->offset,tmp_var->enum_type ); break;
 
-                case ENUM_CLASS_t:
-                    tmp_class = (Enum_class*)var;
-                    enum_name = tmp_class->name.substr(5, tmp_class->name.size()-1);
-                    printEnumType(enum_name, tmp_class->enum_vals); break;
+                case ENUM_CLASS_t:cout << "erroe" << endl;break;
+                   // tmp_class = (Enum_class*)var;
+                   // enum_name = tmp_class->name.substr(5, tmp_class->name.size()-1);
+                    //printEnumType(enum_name, tmp_class->enum_vals); break;
 
 
                 case FUNCTION_t:
@@ -384,6 +388,17 @@ bool Enum_class::contains(string val){
 
             }
             cpy.pop();
+        }
+
+        while(!enums.empty()){
+
+            if(enums.top()->type != ENUM_CLASS_t){
+                cout << "error in enums while"<<endl;
+
+            }
+             Enum_class* enum_tmp = enums.top();
+            printEnumType(enum_tmp->name.substr(5, tmp_class->name.size()-1), enum_tmp->enum_vals);
+                enums.pop();
         }
 
 

@@ -109,10 +109,11 @@ continue 										{
 													return ID; 
 												} 
 0|[1-9][0-9]*									{
-													yylval = new Node(NUM_t,"",yytext);
+													yylval = new Node(NUM_t,yytext,yytext);
 													return NUM; 
 												} 
 ["](([^\n\r\"\\]|\\[rnt"\\])+)["]				{
+													yylval = new Node(STRING_t,yytext,yytext);
 													return STRING;
 												}
 "//"[^\r\n]*[ \r|\n|\r\n]?						;

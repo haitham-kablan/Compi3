@@ -1,14 +1,6 @@
-enum day {SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATARDAY};
-enum day2 {SUNDAY2, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATARDAY};
-
-int enumParam(enum day d){
-    return (int) d;
+enum A {a1, a2, a3};
+	
+void main() {
+	int x = (int) a1;
+	return;
 }
-
-void main()
-{	
-enum day2 x = MONDAY;
-	enumParam(x);
-  
-}
-
