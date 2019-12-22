@@ -142,10 +142,13 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
 				exit(0);
             }
 
-            if (paramTypes[i]->type == ENUM_t){
-                    Enum_class* tmp = table.getVar(enum_type);
-                    if (!tmp.contains((callerParams)[i]->name)){
-
+            if (paramTypes[i] == ENUM_t){
+                    Enum_var* var = (Enum_var*)params[i];
+                    Enum_class* tmp = (Enum_class*)table.getVar(var->enum_type);
+                    if (!tmp->contains((callerParams)[i]->name)){
+                         auto tmp = TokensToString(paramTypes,params);
+                         errorPrototypeMismatch(yylineno, name, tmp );
+                        exit(0);
                     }
             }
         }

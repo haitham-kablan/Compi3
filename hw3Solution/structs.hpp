@@ -21,7 +21,7 @@ using std::string;
 using std::vector;
 using namespace output;
 
-
+class Symbol_Table;
 
 
 
@@ -152,22 +152,5 @@ public:
     
 };
 
-
-class Function : public Variable{
-
-public:
-	TokenType returnType;
-	vector<TokenType> paramTypes;
-	vector<Variable*> params;
-
-	Function(string name , TokenType returnType);
-
-	void addParam(Variable* param);
-
-
-
-	void ValidateParameters(vector<Node*>& callerParams,Symbol_Table table);
-
-};
 
 #endif //COMPI_3_STRUCTS_HPP
