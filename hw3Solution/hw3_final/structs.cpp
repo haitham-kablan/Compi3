@@ -393,7 +393,8 @@ bool Enum_class::contains(string val){
 
             }
              Enum_class* enum_tmp = enums.top();
-            printEnumType(enum_tmp->name.substr(5, tmp_class->name.size()-1), enum_tmp->enum_vals);
+            
+            printEnumType(enum_tmp->name.substr(5, enum_tmp->name.size()-1), enum_tmp->enum_vals);
                 enums.pop();
         }
 
