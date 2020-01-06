@@ -302,7 +302,8 @@ Statement :		LBRACE OPENORMAL Statements RBRACE CLOSE
 						{
 						
 							Variable* var = symbolTable.getVar($1->name);
-							if(var == nullptr ){
+							if(var == nullptr || var->type == FUNCTION_t ){
+								
 								errorUndef(yylineno, $2->name);
 								delete $1;
 								
@@ -516,7 +517,12 @@ Exp :			LPAREN Exp RPAREN
 							}
 							
 						if (symbolTable.isThereEnumContains($1->name) && var == nullptr){
-							$$ = new Node(ENUM_t,$1->name);
+
+							auto tmp = symbolTable.FindEnumContains($1->name);//we know this isn't nullptr for sure
+
+								//todo check value
+
+							$$ = new Enum_var(ENUM_t,$1->name,0,$1->name,tmp->name);
 							
 						
 						}

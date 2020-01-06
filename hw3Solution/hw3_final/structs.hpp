@@ -142,6 +142,7 @@ public:
 	bool CheckIfEnumInGlobalScope(Enum_class* cls);
 	void p_sys_stack(vector<Scope> sys);
 	bool isThereEnumContains(string enum_val);
+	Enum_class* FindEnumContains(string enum_val);
     
 };
 

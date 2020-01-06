@@ -119,13 +119,27 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
             }
         }
 
-        paramTypes.push_back(param->type);
+
+		paramTypes.push_back(param->type);
         param->offset = -1 * (params.size() + 1);
 
 		params.push_back(param);
 	}
 
+
+	//TODO: remove this
+	string typeListToString(const std::vector<string>& argTypes);
+
+
 	void Function::ValidateParameters(vector<Node*>& callerParams , Symbol_Table table) {
+
+	/*
+		for (int j = 0; j < callerParams.size(); j++) {
+			cout << "      callerParams[" << j << "] = " << callerParams[j]->type;
+			cout << "      paramTypes[" << j << "] = " << paramTypes[j] << endl;
+		}
+		*/
+
 		if (callerParams.size() != paramTypes.size()) {
             auto tmp = modifiedTokensToString(paramTypes,params);
             errorPrototypeMismatch(yylineno, name, tmp);
@@ -134,22 +148,51 @@ void Symbol_Table::p_sys_stack(vector<Scope> sys) {
 
 		for (int i = 0; i < paramTypes.size(); i++) {
 
-            if(!(paramTypes[i] == (callerParams)[i]->type || ((callerParams)[i]->type == BYTE_t && paramTypes[i] == INT_t))){
-
+            if(!(paramTypes[i] == (callerParams)[paramTypes.size() - i - 1]->type) && !((callerParams)[paramTypes.size() - i - 1]->type == BYTE_t && paramTypes[i] == INT_t)){
 
                 auto tmp = modifiedTokensToString(paramTypes,params);
                 errorPrototypeMismatch(yylineno, name, tmp );
 				exit(0);
             }
 
+			
+			
             if (paramTypes[i] == ENUM_t){
-                    Enum_var* var = (Enum_var*)params[i];
-                    Enum_class* tmp = (Enum_class*)table.getVar(var->enum_type);
-                    if (!tmp->contains((callerParams)[i]->name)){
+
+		//		for (int j = 0; j < callerParams.size(); j++) {
+		//			cout << "      callerParams[" << paramTypes.size() - j - 1 << "] = " << callerParams[paramTypes.size() - j - 1]->type;
+			//		cout << "      paramTypes[" << j << "] = " << paramTypes[j] << endl;
+			//	}
+				Enum_var* var = (Enum_var*)params[i];
+				Enum_var* caller_var = (Enum_var*)callerParams[paramTypes.size() - i - 1];
+					
+				if (caller_var->type != ENUM_t) {
+					auto tmp = modifiedTokensToString(paramTypes, params);
+					errorPrototypeMismatch(yylineno, name, tmp);
+					exit(0);
+				}
+
+
+			//	cout << "hii" << endl;
+                    
+                   
+				Enum_class* tmp = (Enum_class*)table.getVar(var->enum_type);
+				
+			//	cout << "\t hii 2" << endl;
+
+
+                Enum_class* caller_tmp = (Enum_class*)table.getVar(caller_var->enum_type);
+				//cout << "\t hii 3" << endl;
+				
+					//cout <<  "var->name = " << var->name << "  tmp->name = " << tmp->name << "(callerParams)[paramTypes.size() - i - 1]->name = " << (callerParams)[paramTypes.size() - i - 1]->name << endl;
+                    if (!tmp->contains((callerParams)[paramTypes.size() - i - 1]->name) && caller_tmp->name != tmp->name){
                          auto tmp = modifiedTokensToString(paramTypes,params);
                          errorPrototypeMismatch(yylineno, name, tmp );
                         exit(0);
                     }
+
+					//cout << "\t\t bye" << endl;
+
             }
         }
 	}
@@ -440,6 +483,8 @@ bool isEnumInScope(Scope sc , string enum_val){
     return found;
 
 }
+
+
 bool Symbol_Table::isThereEnumContains(string enum_val){
 
 	
@@ -452,6 +497,64 @@ bool Symbol_Table::isThereEnumContains(string enum_val){
 		
     }
     return false;
+
+
+}
+
+
+
+
+
+Enum_class* FindEnumInScope(Scope sc, string enum_val) {
+
+	stack<Variable*> cpy = stack<Variable*>();
+	Variable* tmp;
+	Enum_class* tmp_class;
+	Enum_class* found = nullptr;
+
+	while (!sc.local_table.empty()) {
+
+		if (sc.local_table.top()->type == ENUM_CLASS_t) {
+
+			tmp_class = (Enum_class*)sc.local_table.top();
+			if (tmp_class->contains(enum_val)) {
+				found = tmp_class;
+				break;
+			}
+		}
+
+		tmp = sc.local_table.top();
+		sc.local_table.pop();
+		cpy.push(tmp);
+	}
+
+	while (!cpy.empty()) {
+
+		tmp = cpy.top();
+		cpy.pop();
+		sc.local_table.push(tmp);
+	}
+
+	return found;
+
+}
+
+
+
+
+Enum_class* Symbol_Table::FindEnumContains(string enum_val) {
+
+	Enum_class* tmp = nullptr;
+
+
+	for (auto i = scopes_table.begin(); i != scopes_table.end(); i++) {
+
+		if (isEnumInScope(*i, enum_val)) {
+			return FindEnumInScope(*i, enum_val);
+		}
+
+	}
+	return nullptr;
 
 
 }
